@@ -1,0 +1,230 @@
+import java.util.Arrays;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class ArreglosMultidimensionales {
+    static Scanner ingresoDatos = new Scanner(System.in);
+	
+	public static void main(String[] args) {
+		
+		System.out.println("============================= PROGRAMA =============================");
+		
+		int opcionMatriz = escogerTipoMatriz();
+		
+		int[][] matriz = llenarMatriz(opcionMatriz);
+		
+		imprimirMatriz(matriz);
+		
+		int opcionMenu = escogerTipoDato();
+		
+		if(opcionMenu == 1) {
+            if (opcionMatriz == 1){
+			    calcularEigenvalue1(matriz);
+            }
+            if (opcionMatriz == 2){
+                calcularEigenvalue2(matriz);
+                }
+		}else {
+			calcularEigenvector(matriz);
+		}
+	}
+	
+	private static int escogerTipoDato() {
+		int opcion = 0;
+		boolean valido = false;
+		
+		System.out.println("Digite '1' para calcular el eigenvalue y '2' para calcular el eigenvector:");
+		
+		do {
+			try {
+				opcion = ingresoDatos.nextInt();
+				
+				if(opcion == 1 || opcion == 2) {
+					valido = true;
+				}else {
+					System.out.println("La opción ingresada no es válida, intente de nuevo.");
+				}
+			}catch(InputMismatchException e) {
+				System.out.println("La opción ingresada no es válida, intente de nuevo.");
+				ingresoDatos.next();
+			}
+		} while (!valido);
+		ingresoDatos.nextLine();
+		return opcion;
+	}
+
+	private static int escogerTipoMatriz() {
+		int opcion = 0;
+		boolean valido = false;
+		
+		System.out.println("Digite '1' para ingresar una matriz 2x2 y '2' para una matriz 3x3:");
+		
+		do {
+			try {
+				opcion = ingresoDatos.nextInt();
+				
+				if(opcion == 1 || opcion == 2) {
+					valido = true;
+				}else {
+					System.out.println("La opción ingresada no es válida, intente de nuevo.");
+				}
+			}catch(InputMismatchException e) {
+				System.out.println("La opción ingresada no es válida, intente de nuevo.");
+				ingresoDatos.next();
+			}
+		} while (!valido);
+		ingresoDatos.nextLine();
+		return opcion;
+	}
+	
+	public static int[][] llenarMatriz(int tipoMatriz) {
+
+		int numColumnas;
+		
+		if(tipoMatriz==1) {
+			numColumnas=2;
+		}else {
+			numColumnas=3;
+		}
+		
+		int[][] matriz = new int[numColumnas][numColumnas];
+		
+		for(int i=0; i < matriz.length;i++) {
+			System.out.println("Ingrese valores para la fila " + (i+1) + " de la matriz " + numColumnas + "x" + numColumnas + ":");
+			for(int j=0; j < matriz[0].length;j++) {
+				boolean valido=false;
+				do {
+					try {
+						int valor = ingresoDatos.nextInt();
+						matriz[i][j] = valor;
+						valido = true;
+					}catch(InputMismatchException e) {
+						System.out.println("Valor no válido. Ingrese solo enteros.");
+						ingresoDatos.next();
+					}
+				}while (!valido);
+				
+			}
+		}
+		
+		return matriz;
+	}
+	
+	private static void imprimirMatriz(int[][] matriz) {
+		for(int i=0; i < matriz.length;i++) {
+			for(int j=0; j < matriz[0].length;j++) {
+				System.out.print(matriz[i][j] + ", ");
+			}
+			System.out.println();
+		}
+	}
+	
+	private static void calcularEigenvalue1(int [][] A) {
+        Scanner sc1 = new Scanner(System.in);
+        // Primer calculamos los eigenvalues que pueden haber con respecto a la matriz
+        //Los valores a continuación son los valores del determinante de A-lambda(I)
+        double a = 1.0;
+        double b = -(A[0][0] + A[1][1]);
+        double c = (A[0][0] * A[1][1]) - (A[0][1] * A[1][0]);
+
+        double discriminante = b * b - 4 * a * c;
+
+        if (discriminante < 0) {
+            System.out.println("La matriz tiene valores lambda complejos, no se puede calcular algun eigenvector");
+        }
+        double lambda1 = (-b + Math.sqrt(discriminante)) / (2 * a);
+        double lambda2 = (-b - Math.sqrt(discriminante)) / (2 * a);
+
+        
+        System.out.println("Escoja uno de los eigenvectors posibles: ");
+        int opcionEV;
+        //Calcular los EigenVectors
+        System.out.println("Opcion 1:");
+        calcularEVparalambda(A, lambda1);
+        System.out.println("Opcion 2:");
+        calcularEVparalambda(A, lambda2);
+        opcionEV = sc1.nextInt();
+        if (opcionEV == 1) {
+            System.out.println("El valor de lambda es: " + lambda1);
+        }
+        if (opcionEV == 2) {
+            System.out.println("El valor de lambda es: " + lambda2);
+        }
+        sc1.close();
+	}
+
+    private static void calcularEigenvalue2(int [][] A) {
+        // Step 1: Calculate eigenvalues
+        double[] eigenvalues = calculateEigenvalues(A);
+
+        // Step 2: Calculate eigenvectors for each eigenvalue
+        for (double lambda : eigenvalues) {
+            System.out.println("\nCalculating eigenvector for lambda = " + lambda + ":");
+            calculateEigenvector(A, lambda);
+        }
+	}
+
+	private static void calcularEigenvector(int [][] A) {
+        Scanner sc2 = new Scanner(System.in);
+        // Primer calculamos los eigenvalues que pueden haber con respecto a la matriz
+        //Los valores a continuación son los valores del determinante de A-lambda(I)
+        double a = 1.0;
+        double b = -(A[0][0] + A[1][1]);
+        double c = (A[0][0] * A[1][1]) - (A[0][1] * A[1][0]);
+
+        double discriminante = b * b - 4 * a * c;
+
+        if (discriminante < 0) {
+            System.out.println("La matriz tiene valores lambda complejos");
+        }
+
+        double lambda1 = (-b + Math.sqrt(discriminante)) / (2 * a);
+        double lambda2 = (-b - Math.sqrt(discriminante)) / (2 * a);
+
+        System.out.println("Escoja uno de los eigenvalues posibles: ");
+        int opcionEV;
+        System.out.println("Opcion 1: " + lambda1);
+        System.out.println("Opcion 2: " + lambda2);
+        opcionEV = sc2.nextInt();
+        System.out.println("El eigenvector de la matriz con respecto al valor lambda es: ");
+        if (opcionEV == 1) {
+            calcularEVparalambda(A, lambda1);
+        }
+        if (opcionEV == 2) {
+            calcularEVparalambda(A, lambda2);
+        }
+        sc2.close();
+	}
+
+	private static int ingresarEigenvalue() {
+		
+		return 0;
+	}
+
+    private static void calcularEVparalambda(int[][] A, double lambda) {
+        // Calculamos (A - lambda * I)
+        double[][] ALambdaI = new double[2][2];
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 2; j++) {
+                ALambdaI[i][j] = A[i][j] - (i == j ? lambda : 0);
+            }
+        }
+
+        //Resolvemos (A - lambda * I) * v = 0
+        double x, y;
+        if (ALambdaI[0][0] != 0) {
+            y = 1; // Valor de referencia
+            x = -ALambdaI[0][1] * y / ALambdaI[0][0];
+        } else if (ALambdaI[1][1] != 0) {
+            x = 1; // Valor de referencia
+            y = -ALambdaI[1][0] * x / ALambdaI[1][1];
+        } else {
+            System.out.println("No se puede determinar el eigenvector.");
+            return;
+        }
+
+        // Output the eigenvector
+        System.out.println("v = [ " + x);
+        System.out.println("      " + y + "]");
+    }
+}
